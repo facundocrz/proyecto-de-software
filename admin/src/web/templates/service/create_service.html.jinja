@@ -1,0 +1,91 @@
+{% extends "layout.html.jinja" %}
+
+{% block main %}
+
+<!-- Iconos fontawesome -->
+<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.css') }}">
+
+<!-- Crear Servicio -->
+<p>
+<h1 class="h3 mb-3 fw-normal"> Formulario de Creación de SERVICIO</h1>
+</p>
+
+<form action="{{ url_for('service.create') }} " method="POST" id="form_crear" name="form_crear" class="needs-validation"
+    novalidate>
+    <div class="row mb-4">
+        <!-- nombre input -->
+        <div class="col">
+            <div class="form-outline shadow-sm p-1 mb-1 bg-black rounded">
+                <label class="form-label" for="title"> <b> Nombre del Servicio</b> </label>
+                <input type="text" id="title" name="title" class="form-control"
+                    pattern="[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ0-9 ]*" required />
+                <div class="invalid-feedback">
+                    Por favor, ingrese un nombre de Servicio válido.
+                    <br>
+                    El nombre de servicio debe tener entre 5 y 40 letras y digitos.
+                    <br>
+                    No puede comenzar con números ni contener símbolos.
+                </div>
+            </div>
+        </div>
+        <!-- description input -->
+        <div class="col">
+            <div class="form-outline shadow-sm p-1 mb-1 bg-black rounded">
+                <label class="form-label" for="description_service "> <b> Descripcion del Servicio </b> </label>
+                <input type="text" id="description" name="description" class="form-control"
+                    pattern="[a-zA-Zá-úÁ-ÚñÑ]+[a-zA-Zá-úÁ-ÚñÑ0-9 ]*" required />
+                <div class="invalid-feedback">
+                    Por favor, ingrese una descripcion válida.
+                    <br>
+                    La descripcion debe tener entre 10 y 50 letras.
+                    <br>
+                    No puede comenzar con números ni contener símbolos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  keywords input -->
+    <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+        <label class="form-label" for="keywords"> <b> Palabaras clave de busqueda (Separar las palabras por , Ej:k1,k2,)
+            </b> </label>
+        <input type="text" id="keywords" name="keywords" class="form-control"
+            pattern="^[a-zA-Zá-úÁ-ÚñÑ]+(?:,[a-zA-Zá-úÁ-ÚñÑ]+[0-9]*)*$" required /> 
+            
+        <div class="invalid-feedback">
+            Por favor, ingrese palabras claves válidas.
+            <br>
+            Las palabras claves no pueden contener espacios en blanco.
+        </div>
+    </div>
+
+    <!--  type input -->
+    <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+        <label class="form-label" for="type"> <b> Tipo de Servicio </b> </label>
+        <div>
+            <label for="opciones">Elige una opción:</label>
+            <select id="opciones" name="opciones">
+                <option value="1">Analisis</option>
+                <option value="2">Consultoria</option>
+                <option value="3">Desarrollo</option>
+            </select>
+        </div>
+    </div>
+    <!--  input -->
+    <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+        <label class="form-label" for="state"> <b> Estado de habilitacion </b> </label>
+        <div>
+            <label for="state">Elige una opción:</label>
+            <select id="state" name="state">
+                <option value='True'>Habilitar</option>
+                <option value='False'>Deshabilitar</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-save"></i> CREAR</button>
+    <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('service.index') }}" role="button">RETROCEDER</a>
+
+</form>
+
+{% endblock %}

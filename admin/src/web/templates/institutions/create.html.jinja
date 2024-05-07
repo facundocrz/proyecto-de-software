@@ -1,0 +1,88 @@
+{% extends "layout.html.jinja" %}
+
+{% block main %}
+
+<!-- Iconos fontawesome -->
+<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.css') }}">
+
+<p>
+<h1 class="h3 mb-3 fw-normal"> Formulario de Creación de INSTITUCION</h1>
+</p>
+
+<form action="{{ url_for('institutions.create') }} " method="POST" id="form_crear" name="form_crear" class="needs-validation" novalidate>
+  <div class="row mb-4">
+
+   <!-- nombre input -->
+    <div class="col">
+      <div class="form-outline shadow-sm p-1 mb-1 bg-black rounded">
+        <label class="form-label" for="name"> <b> Nombre Institucion(*)</b> </label>
+        <input type="text" class="form-control" id="name" name="name" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" placeholder="insittucion1..." required>
+        <div class="invalid-feedback">
+          Por favor, ingrese un nombre válido.
+        <br>
+          Los nombres solo pueden contener letras y espacios.
+        <br>
+          No pueden comenzar ni terminar con espacios.
+        </div>
+      </div>
+    </div>
+
+  <!-- info input -->
+    <div class="col">
+      <div class="form-outline shadow-sm p-1 mb-1 bg-black rounded">
+        <label class="form-label" for="information"> <b> Information institution(*) </b> </label>
+        <input type="text" id="information" name="information" class="form-control" placeholder="InformacionDeInstitucion..." required />
+      </div>
+    </div>
+  </div>
+
+  <!-- direccion input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="address"> <b> Direccion(*) </b> </label>
+    <input type="text" id="address" name="address" class="form-control" placeholder="25 e 64 y 65..." required/>
+  </div>
+
+  <!-- input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="location"> <b> Localizacion(Lat;Long)(*) </b> </label>
+    <input type="text" id="location" name="location" class="form-control" placeholder="-43.123 ; -12.321" pattern="[^ ]{4,32}[0-9]" required />
+    <div class="invalid-feedback">
+        Por favor, ingrese un Localizacion válida.
+    <br>
+        Las Localizaciones solo pueden contener numeros y digitos ej: -12.123 ; 54.123.
+    <br>
+        No pueden comenzar ni terminar con espacios.
+    </div>
+  </div>
+
+  <!--  input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="web"> <b> web(*) </b> </label>
+    <input type="text" id="web" name="web" class="form-control" placeholder="www.ejemplo.@gmail.com" required />
+  </div>
+
+   <!--  input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="keywords"> <b> Palabaras clave de busqueda(ej: cla1, cla2, cla3)(*) </b> </label>
+    <input type="text" id="keywords" name="keywords" class="form-control" placeholder="ej: cla1, cla2, cla3" required />
+  </div>
+
+   <!--  input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="date_time"> <b> Dia y Horario(*)  </b> </label>
+    <input type="text" id="date_time" name="date_time" class="form-control" placeholder="lunes a viernes, 14hs..." required />
+  </div>
+
+   <!--  input -->
+  <div class="form-outline mb-4 shadow-sm p-1 mb-1 bg-black rounded">
+    <label class="form-label" for="contact"> <b> Informacion de Contacto(*)</b> </label>
+    <input type="text" id="contact" name="contact" class="form-control" placeholder="221 431243..." required />
+  </div>
+
+
+  <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-save"></i> CREAR</button>
+  <a class="btn btn-primary btn-lg btn-block" href="{{ url_for('institutions.index') }}" role="button">RETROCEDER</a>
+
+</form>
+
+{% endblock %}

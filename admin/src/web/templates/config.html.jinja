@@ -1,0 +1,65 @@
+{% extends "layout.html.jinja" %}
+
+{% block main %}
+
+<!-- Iconos fontawesome -->
+<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.css') }}">
+
+
+
+
+  <main id="main">
+<div class="d-flex align-items-center flex-column mt-3 pb-5 justify-content-center w-100 h-100">
+  <div class="d-flex align-items-center flex-column justify-content-center w-100 own_form_title">
+    
+    <div class="d-flex flex-column mt-5 justify-content-center align-items-center own_form_title w-100">
+       <h1>Mi configuración </h1>
+    </div>
+  </div>
+  <div class="container mt-3 own_form align-items-center" style="max-width: 800px">
+    
+  <form action="{{ url_for('config.update') }}" method="post" class="d-flex flex-column">
+
+    <div class="form-group">
+      <label class="form-label" for="cant">Cantidad de filas por página:</label>
+      <input class="form-control" id="cant" min="1" name="cant"  type="number" value="{{config.cant}}">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label" for="contact">Información de contacto:</label>
+      <input class="form-control" id="contact" name="contact"  type="text" value="{{config.contact}}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Información de email:</label>
+      <input class="form-control" id="email" name="email"  type="text" value="{{config.email}}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="state">opcion para Activar/Desactivar sistema:</label>
+      <select class="form-select" id="state" name="state">
+      {% if config.state %}
+        <option selected value="True">Habilitado</option>
+        <option value="False">Deshabilitado</option>
+      {% else %}
+        <option value="True">Habilitado</option>
+        <option selected value="False">Deshabilitado</option>
+      {% endif %}
+
+      </select>
+    </div>
+    
+    
+    <div class="form-group">
+      <label class="form-label" for="information">Mensaje de Mantenimiento:</label>
+      <input class="form-control" id="information" name="information" required type="text" value="{{config.information}}">
+    </div>
+
+
+    <br>
+    <button type="submit" class="btn btn-success btn-lg btn-block mt-3"><i class="fa fa-save"></i> Guardar</button>
+    
+    
+  </form>
+  
+{% endblock %}

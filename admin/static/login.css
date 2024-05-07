@@ -1,0 +1,55 @@
+html,body {
+  height: 100%;
+}
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  min-height: 100vh;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+
+main {
+  flex:1;
+}
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+
+.form-config {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+  background-color: rgba(124, 122, 122, 0.144);
+  
+}
+
+#miTexto {
+  font-family: "Arial", sans-serif; /* Tipo de fuente */
+  font-size: 34px; /* Tamaño de fuente */
+  font-weight: bold; /* Grosor de fuente (negrita) */
+  color: #007bff; /* Color de texto */
+  text-transform: uppercase; /* Convertir texto a mayúsculas */
+  letter-spacing: 2px; /* Espaciado entre letras */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra de texto */
+}

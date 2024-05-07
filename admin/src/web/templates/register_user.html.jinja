@@ -1,0 +1,59 @@
+{% extends "layout.html.jinja" %}
+
+{% block title %} Registrar {% endblock %}
+
+{% block main %}
+<div class="d-flex flex-column justify-content-center align-items-center">
+  <div class="card mb-3">
+    <div class="card-header">
+      <h2>Registrarse</h2>
+    </div>
+    <form action="{{ url_for('user.register') }}" method="POST" class="needs-validation" novalidate>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">
+              Por favor, ingrese una dirección de correo electronico válida.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="first_name" class="form-label">Nombre/s (*)</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+            <div class="invalid-feedback">
+              Por favor, ingrese un nombre válido.
+              <br>
+              Los nombres solo pueden contener letras y espacios.
+              <br>
+              No pueden comenzar ni terminar con espacios.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="last_name" class="form-label">Apellido/s (*)</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+            <div class="invalid-feedback">
+              Por favor, ingrese un apellido válido.
+              <br>
+              Los apellidos solo pueden contener letras y espacios.
+              <br>
+              No pueden comenzar ni terminar con espacios.
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <span class="form-text">(*) Campo requerido</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+        <button class="btn btn-secondary" onclick="history.back()">Volver</button>
+        <button type="submit" class="btn btn-success ms-2">Registrarse</button>
+      </div>
+    </form>
+  </div>
+  <button type="button" class="btn btn-outline-danger mb-3"
+    onclick="window.location.href='{{url_for('google_auth.login_google')}}'">
+    <i class="fab fa-google"></i> Ingresar con Google
+  </button>
+</div>
+{% endblock %}

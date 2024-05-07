@@ -1,0 +1,297 @@
+{% extends "layout.html.jinja" %}
+
+{% block title %}Usuarios{% endblock %}
+
+{% block main %}
+
+<h1>Gestión de usuarios</h1>
+
+<form class="input-group mb-3" method="get" action="{{ url_for('user.index') }}">
+  <input type="text" class="form-control" placeholder="Buscar por email" name="email" value="{{ filter_email }}">
+  <select class="form-select" name="filter">
+    <option value="all">Buscar todos</option>
+    <option value="active" {% if filter_active == 'active' %}selected{% endif %}>Buscar solo activos</option>
+    <option value="blocked" {% if filter_active == 'blocked' %}selected{% endif %}>Buscar solo bloqueados</option>
+  </select>
+  <button type="submit" class="btn btn-primary">
+    <i class="bi bi-search"></i>
+    Buscar
+  </button>
+</form>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create_modal">
+  <i class="bi bi-plus-lg"></i>
+  Agregar usuario
+</button>
+
+<!-- List -->
+{% if users_count > 0 %}
+  <table class="table table-dark table-striped table-bordered table-hover table-responsive mt-3 align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Nombre de usuario</th>
+        <th scope="col">Email</th>
+        <th scope="col">Nombre(s)</th>
+        <th scope="col">Apellido(s)</th>
+        <th scope="col">Activo</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{user.username}}</td>
+          <td>{{user.email}}</td>
+          <td>{{user.first_name}}</td>
+          <td>{{user.last_name}}</td>
+          <td>
+            {% if user.activo %}
+              Si
+            {% else %}
+              No
+            {% endif %}
+          </td>
+          <td>
+            <a class="btn btn-outline-light" href="{{ url_for('user.role.index', userid=user.id) }}"><i class="bi bi-ui-checks"></i></a>
+            <a class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#update_modal_{{ user.id }}"><i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#delete_modal_{{ user.id }}"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <nav>
+    <ul class="pagination">
+      {% if page <= 1 %}
+        <li class="page-item disabled">
+          <a class="page-link"><i class="bi bi-arrow-left"></i></a>
+        </li>
+      {% else %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('user.index', page=(page - 1)) }}"><i class="bi bi-arrow-left"></i></a>
+        </li>
+      {% endif %}
+      {% for i in range(1, page_count + 1) %}
+        <li class="page-item{% if i == page %} active{% endif %}">
+          <a class="page-link" href="{{ url_for('user.index', page=i) }}">{{i}}</a>
+        </li>
+      {% endfor %}
+      {% if page >= page_count %}
+        <li class="page-item disabled">
+          <a class="page-link"><i class="bi bi-arrow-right"></i></a>
+        </li>
+      {% else %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('user.index', page=(page + 1)) }}"><i class="bi bi-arrow-right"></i></a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% else %}
+  <h2 class="mt-3">No hay ningún usuario para mostrar</h2>
+{% endif %}
+
+<!-- Create -->
+<div class="modal modal-lg fade" id="create_modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Crear usuario</h1>
+      </div>
+      <form action="{{ url_for('user.create') }}" method="post" class="needs-validation" novalidate>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="create_username" class="form-label">Nombre de usuario (*)</label>
+              <input type="text" class="form-control" id="create_username" name="username" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ0-9._]{2,18}[a-zA-Zá-úÁ-ÚñÑ0-9]" required>
+              <div class="invalid-feedback">
+                Por favor, ingrese un nombre de usuario válido.
+                <br>
+                El nombre de usuario debe tener entre 4 y 20 letras, dígitos, '.' y '_'.
+                <br>
+                No puede comenzar con números o símbolos ni terminar en símbolos.
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="create_email" class="form-label">Email (*)</label>
+              <input type="email" class="form-control" id="create_email" name="email" required>
+              <div class="invalid-feedback">
+                Por favor, ingrese una dirección de correo electronico válida.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="create_first_name" class="form-label">Nombre/s (*)</label>
+              <input type="text" class="form-control" id="create_first_name" name="first_name" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+              <div class="invalid-feedback">
+                Por favor, ingrese un nombre válido.
+                <br>
+                Los nombres solo pueden contener letras y espacios.
+                <br>
+                No pueden comenzar ni terminar con espacios.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="create_last_name" class="form-label">Apellido/s (*)</label>
+              <input type="text" class="form-control" id="create_last_name" name="last_name" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+              <div class="invalid-feedback">
+                Por favor, ingrese un apellido válido.
+                <br>
+                Los apellidos solo pueden contener letras y espacios.
+                <br>
+                No pueden comenzar ni terminar con espacios.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="create_password" class="form-label">Contraseña (*)</label>
+              <input type="password" class="form-control password-field" id="create_password" name="password" pattern="[^ ]{4,32}" required>
+              <div class="invalid-feedback">
+                Por favor, ingrese una contraseña válida.
+                <br>
+                Las contraseñas deben tener entre 4 y 32 carácteres, no pueden tener espacios.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="create_password_repeat" class="form-label">Repetir contraseña (*)</label>
+              <input type="password" class="form-control confirm-password-field" id="create_password_repeat" name="password_repeat" required>
+              <div class="invalid-feedback">
+                Por favor, repita la contraseña aquí. Las contraseñas deben coincidir.
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input type="checkbox" role="switch" class="form-check-input" id="create_active" name="active" checked>
+                <label class="form-check-label" for="create_active">Activo</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <span class="form-text">(*) Campo requerido</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update -->
+{% for user in users %}
+  <div class="modal modal-lg fade" id="update_modal_{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Modificar usuario "{{ user.username }}"</h1>
+        </div>
+        <form action="{{ url_for('user.update', userid=user.id) }}" method="post" class="needs-validation" novalidate>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="update_username_{{ user.id }}" class="form-label">Nombre de usuario (*)</label>
+                <input type="text" class="form-control" id="update_username_{{ user.id }}" name="username" value="{{ user.username }}" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ0-9._]{2,18}[a-zA-Zá-úÁ-ÚñÑ0-9]" required>
+                <div class="invalid-feedback">
+                  Por favor, ingrese un nombre de usuario válido.
+                  <br>
+                  El nombre de usuario debe tener entre 4 y 20 letras, dígitos, '.' y '_'.
+                  <br>
+                  No puede comenzar con números o símbolos ni terminar en símbolos.
+                </div>
+              </div>
+              <div class="col-12">
+                <label for="update_email_{{ user.id }}" class="form-label">Email (*)</label>
+                <input type="email" class="form-control" id="update_email_{{ user.id }}" name="email" value="{{ user.email }}" required>
+                <div class="invalid-feedback">
+                  Por favor, ingrese una dirección de correo electronico válida.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="update_first_name_{{ user.id }}" class="form-label">Nombre/s (*)</label>
+                <input type="text" class="form-control" id="update_first_name_{{ user.id }}" name="first_name" value="{{ user.first_name }}" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+                <div class="invalid-feedback">
+                  Por favor, ingrese un nombre válido.
+                  <br>
+                  Los nombres solo pueden contener letras y espacios.
+                  <br>
+                  No pueden comenzar ni terminar con espacios.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="update_last_name_{{ user.id }}" class="form-label">Apellido/s (*)</label>
+                <input type="text" class="form-control" id="update_last_name_{{ user.id }}" name="last_name" value="{{ user.last_name }}" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ ]{0,22}[a-zA-Zá-úÁ-ÚñÑ]" required>
+                <div class="invalid-feedback">
+                  Por favor, ingrese un apellido válido.
+                  <br>
+                  Los apellidos solo pueden contener letras y espacios.
+                  <br>
+                  No pueden comenzar ni terminar con espacios.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="update_password_{{ user.id }}" class="form-label">Contraseña</label>
+                <input type="password" class="form-control password-field" id="update_password_{{ user.id }}" name="password" disabled pattern="[^ ]{4,32}" required>
+                <div class="invalid-feedback">
+                  Por favor, ingrese una contraseña válida.
+                  <br>
+                  Las contraseñas deben tener entre 4 y 32 carácteres, no pueden tener espacios.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="update_password_repeat_{{ user.id }}" class="form-label">Repetir contraseña</label>
+                <input type="password" class="form-control confirm-password-field" id="update_password_repeat_{{ user.id }}" name="password_repeat" disabled required>
+                <div class="invalid-feedback">
+                  Por favor, repita la contraseña aquí. Las contraseñas deben coincidir.
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check form-switch">
+                  <input type="checkbox" role="switch" class="form-check-input change-password" id="update_change_password_{{ user.id }}" name="change_password" data-userid="{{ user.id }}">
+                  <label class="form-check-label" for="update_change_password_{{ user.id }}">Cambiar contraseña</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check form-switch">
+                  <input type="checkbox" role="switch" class="form-check-input" id="update_active_{{ user.id }}" name="active" {% if user.activo %}checked{% endif %}>
+                  <label class="form-check-label" for="update_active_{{ user.id }}">Activo</label>
+                </div>
+              </div>
+              <div class="col-12 mt-2">
+                <span class="form-text">(*) Campo requerido</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+<!-- Delete -->
+{% for user in users %}
+  <div class="modal modal-lg fade" id="delete_modal_{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{{ url_for('user.delete', userid=user.id) }}" method="post">
+          <div class="modal-body">
+            <p class="mb-0">¿Está seguro que desea eliminar el usuario "{{ user.username }}"?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock %}

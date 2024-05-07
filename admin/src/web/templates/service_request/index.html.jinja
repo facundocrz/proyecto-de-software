@@ -1,0 +1,308 @@
+{% extends "layout.html.jinja" %}
+
+
+{% block main %}
+
+<h1>Gestion Solicitudes de Servicio </h1>
+<br>
+<h5>(buscar fechas por rango "inicio - fin")</h5>
+
+<form class="input-group mb-3">
+  <input type="date" class="form-control" placeholder="buscar rango(inicioFecha)"name="fecha_inicio" >
+  <input type="date" class="form-control" placeholder="Buscar rango(finFecha)"name="fecha_fin" >
+    <input type="text" class="form-control" placeholder="Buscar por servicio" name="title" value="{{ filter_title }}">
+  <select class="form-select" name="filter" id="filter">
+    <option value="all">Buscar todos</option>
+    <option value="Aceptada" {% if filter == 'Aceptada' %}selected{% endif %}>Aceptado</option>
+    <option value="Rechazada" {% if filter == 'Rechazada' %}selected{% endif %}>Rechazado</option>
+    <option value="En Proceso" {% if filter == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+    <option value="Finalizada" {% if filter == 'Finalizada' %}selected{% endif %}>Finalizado</option>
+     <option value="Rechazada" {% if filter == 'Rechazada' %}selected{% endif %}>Rechazado</option>
+  </select>
+
+  <button type="submit" class="btn btn-primary">
+    <i class="bi bi-search"></i>
+    Buscar
+  </button>
+</form>
+
+  <!-- tabla Solicitud de Servicios  -->
+ 
+<div class="container">
+
+<!--  -->
+
+  <div class="col-md-15">
+    {% if re_count > 0 %}
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr class="bg-primary text-white">
+          <th>Titulo</th>
+          <th>Usuario</th>
+          <th>Servicio</th>
+          <th>Fecha de solicitud</th>
+          <th>Fecha Act de estado</th>
+          <th>Estado</th>
+          <th class="text-center">Operaciones</th>
+        </tr>
+      </thead>
+
+ 
+      <tbody id="myTable">
+        {% for r in r %}
+        <tr>
+          <td> {{ r.title }}</td>
+         {% for user in users %}
+         {% if user.id == r.user_id %}
+          <td> {{ user.username }} </td>
+          {% endif %}
+          {% endfor %}
+          <td> {{ r.service.title }} </td>
+
+
+          <td> {{ r.created_at.strftime('%d-%m-%Y %H:%M')}} </td>
+          <td> {{ r.updated_at.strftime('%d-%m-%Y %H:%M') }} </td> 
+          <td> <!-- Estado(aceptado,rechazado,en proceso,finalizado, cancelado) -->   
+          {% if r.current_status == "Aceptada" or  r.current_status == "Finalizada" or r.current_status == "En proceso" %}
+              <button type="button" class="btn btn-success "data-bs-toggle="modal"
+              data-bs-target="#modalestado{{r.id}}">
+              <i class="fa-sharp fa-solid fa-link"></i>{{ r.current_status }}</button>
+          {% else %}
+              <button type="button" class="btn btn-danger "data-bs-toggle="modal"
+              data-bs-target="#modalestado{{r.id}}">
+              <i class="fa-sharp fa-solid fa-link"></i>{{ r.current_status }}</button>
+          {% endif %}             
+
+          </td>
+          <td align="center">
+
+            <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#modalnotas{{r.id}}">
+              <i class="fa-solid fa-user-plus"></i>  Notas
+            </button>
+
+            <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#modalshow{{r.id}}">
+              <i class="fa-sharp fa-solid fa-magnifying-glass fa-lg"></i> Detalle
+            </button>
+
+            <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#modalHistorial{{r.id}}">
+              <i class="fa-sharp fa-solid fa-magnifying-glass fa-lg"></i> Historial
+            </button>
+
+            <a href="{{ url_for( 'service_request.delete',id = r.id )}}" class="text-danger"
+              onClick="return confirm('¿Esta seguro que desea eliminar la institucion?');"><i class="fa fa-fw fa-trash"></i>
+              Eliminar</a> <!--  -->
+          </td>
+
+        </tr>
+
+       </form>
+        </div>
+       </div>
+
+         <!-- Modal para el Show historial de estado q realizo la solicitud -->
+                <div class="modal fade" id="modalHistorial{{r.id}}" tabindex="-1" aria-labelledby="modalHistorial"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalHistorial">Informacion De historial de cambio de estado</h5>
+                            </div>
+                     <div class="modal-body">
+
+  
+                     <div class="row">           
+                           <div class="card">
+                              <div class="card-body">
+                              <h1>Historial </h1> <br><br> 
+                      {% for s in requestStatus %}   
+                      {% if s.request_id == r.id %}  
+                                 
+                                 <p class="card-text">
+                                 Estado: <b> {{ s.status_changed_to }}   </b>
+                                 <p></p>
+                                 Observacion: <b>{{ s.observation }} </b>
+                                  <p></p>
+                                 Fecha : <b>{{ s.created_at.strftime('%d-%m-%Y %H:%M') }} </b>
+                                 <p></p>
+                                  Usuario : <b>{{ s.user.username }} </b>
+                                  <p></p> 
+                                  <hr>
+                        {% endif %}
+                         
+                      {% endfor %}
+                              </div>
+                           </div>
+                       
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               </div>
+
+             <!-- Modal para el Show de usuario q realizo la solicitud -->
+                <div class="modal fade" id="modalshow{{r.id}}" tabindex="-1" aria-labelledby="modalshow"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalshow">Informacion Usuario que realizo Solicitud</h5>
+                            </div>
+                     <div class="modal-body">
+
+                      {% for user in users %}   
+                      {% if user.id == r.user_id %}    
+                     <div class="row">           
+                           <div class="card">
+                              <div class="card-body">
+                                 <h1>Datos del perfil</h1> <br><br> 
+                                 <p class="card-text">
+                                 Nombre de usuario: <b> {{ user.username }}   </b>
+                                 <p></p>
+                                 Correo: <b>{{ user.email }} </b>
+                                 <p></p>
+                                 Nombre: <b> {{ user.first_name }}  </b> 
+                                 <p></p>
+                                 Apellido: <b> {{ user.last_name }} </b>
+                                 <p></p>  
+                                 <br>
+                                 Descripcion del servicio: <br>
+                                 <b> {{ r.description }} </b>  
+                                 </p>
+                              </div>
+                           </div>
+                       
+                        {% endif %}
+                      {% endfor %}
+      
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               </div>
+
+
+         <!-- Modal para el modificar estado de solicitud-->
+                <div class="modal fade" id="modalestado{{r.id}}" tabindex="-1" aria-labelledby="modalestado"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalestado">Estado</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('service_request.chage_status', id=r.id) }}" method="POST">
+                                    <label class="form-label" for="first_name" style="float: left;"> <b> Seleccione un Estado </b>
+                                    </label>
+                                    <select class="form-select form-select-lg mb-3" id="current_status" name="current_status"
+                                        class="selectpicker form-control">
+                                        <option selected disabled>Seleccionar un Estado de la solicitud</option>
+                                        <option value="En proceso">En Proceso</option>
+                                        <option value="Aceptada">Aceptado</option>
+                                        <option value="Rechazada">Rechazado</option>
+                                        <option value="Finalizada">Finalizado</option>
+                                        <option value="Cancelada">Cancelado</option>
+                                       
+                                    </select>
+                                    <label class="form-label" for="first_name" style="float: left;">
+                                     <b> Agregue una observacion: </b> </label>
+                                    <input type="text" id="observation" name="observation" placeholder="unaObservacion" class="form-control" />    
+                                     <br>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary btn-lg"
+                                            data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="submit" class="btn btn-success btn-lg btn-block"><i
+                                                class="fa fa-save"></i> Guardar</button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Modal para el modificar/agregar notas/comentario-->
+                <div class="modal fade" id="modalnotas{{r.id}}" tabindex="-1" aria-labelledby="modalestado"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="modalestado">Comentarios</h3>
+                            </div>
+                            <div class="modal-body">
+
+                                <form action="{{ url_for('service_request.comment', id=r.id, user_id=r.user_id) }}" method="POST">
+                                    <div class="form-group">
+                                    <label class="text-white" class="form-label" for="content" style="float: left;"> <b> Agregar Comentario:</b> </label>
+                                    <input type="text" id="content" name="content" class="form-control" placeholder="agregar Comentario" required />                              
+                                    <br>
+                                    </div>
+
+                                    <div>
+                                        <button type="button" class="btn btn-secondary btn-lg"
+                                            data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="submit" class="btn btn-success btn-lg btn-block"><i
+                                                class="fa fa-save"></i> Guardar</button>
+                                    </div>
+
+                                </form>
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="modalestado">todos los Comentarios</h3>
+                            </div>
+                            {% for c in com %}
+                            {% if r.id == c.request_id %}
+                              <p></p>  
+                                {{get_username(c.user_id)}}: {{ c.content }}<p></p>  
+                                Fecha : <b>{{ c.updated_at.strftime('%d-%m-%Y %H:%M') }} </b>
+                                <hr>
+                           {% endif %}
+                            {% endfor %}
+                          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+        {% endfor %}
+      </tbody>
+    </table> 
+<!-- Paginacion -->
+<nav>
+  <ul class="pagination"> 
+    {% if page <= 1 %}
+      <li class="page-item disabled">
+        <a class="page-link"><i class="bi bi-arrow-left"></i></a>
+      </li>
+    {% else %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('service_request.index', page=(page - 1)) }}"><i class="bi bi-arrow-left"></i></a>
+      </li>
+    {% endif %}
+    {% for i in range(1, page_count + 1) %}
+      <li class="page-item{% if i == page %} active{% endif %}">
+        <a class="page-link" href="{{ url_for('service_request.index', page=i) }}">{{i}}</a>
+      </li>
+    {% endfor %}
+    {% if page >= page_count %}
+      <li class="page-item disabled">
+        <a class="page-link"><i class="bi bi-arrow-right"></i></a>
+      </li>
+    {% else %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('service_request.index', page=(page + 1)) }}"><i class="bi bi-arrow-right"></i></a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% else %}
+<h1>NO HAY NINGUNA SOLICITUD DE SERVICIO PARA MOSTRAR</h1>
+{% endif %}
+ 
+ 
+
+ </div>
+ </div>
+{% endblock %}

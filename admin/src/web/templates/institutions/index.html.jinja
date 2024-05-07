@@ -1,0 +1,251 @@
+{% extends "layout.html.jinja" %}
+
+
+{% block main %}
+
+<h1>Gestion Instituciones </h1>
+<br>
+
+<!-- tabla usuarios  -->
+
+<div class="container">
+  
+  <div class="col-sm-10">
+    <table>
+
+        <th>         
+            <a href="{{ url_for('institutions.create') }}"> <button type="button" class="btn btn-warning ">
+            <i class="fa-solid fa-user-plus"></i>Agregar Institución</button> </a>
+        </th>
+        <th></th>
+
+     </table>                
+   </div>
+
+<br>
+<!--  -->
+
+  <div class="col-md-15">
+  
+  {% if inst_count > 0 %}
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr class="bg-primary text-white">
+          <th>Nombre</th>
+          <th>Web</th>
+          <th>Localizacion(Lat;Long)</th>
+          <th>Dia y Hora</th>
+          <th>Informacion de Contacto</th>
+          <th>Estado</th>
+          <th class="text-center">Operaciones</th>
+        </tr>
+      </thead>
+
+ 
+      <tbody id="myTable">
+        {% for i in inst %}
+        <tr>
+          <td> {{ i.name }}             
+         
+          </td>
+          <td> {{ i.web }} </td>
+          <td> {{ i.location }} </td>
+          <td> {{ i.date_time }} </td>
+          <td> {{ i.contact }} </td>
+          {% if i.activo  %}
+          <td> Habilitado </td>
+          {% else %}
+          <td> Deshabilitado </td>
+          {% endif %}
+          
+          <td align="center">
+            <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#modaledit{{i.id}}">
+              <i class="fa-solid fa-pen-to-square"></i> Editar
+            </button>
+
+             <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#modalshow{{i.id}}">
+          <i class="fa-sharp fa-solid fa-magnifying-glass fa-lg"></i> Detalle</button>
+
+            <button type="button" class="btn btn-white" >
+            <a href="{{ url_for( 'institutions.activate_deactivate',id = i.id )  }}"
+              onClick="return confirm('¿Esta seguro que desea cambiar el estado de la institucion?');"><i
+                class="fa fa-fw fa-trash" ></i> Activar/Desactivar</a> <!--  -->
+            </button>
+            
+            <a href="{{ url_for( 'institutions.delete',id = i.id )  }}" class="text-danger"
+              onClick="return confirm('¿Esta seguro que desea eliminar la institucion?');"><i class="fa fa-fw fa-trash"></i>
+              Eliminar</a> <!--  -->
+
+
+          </td>
+
+        </tr>
+
+             <!-- Modal para la vista de informacion de instituciones  -->
+                <div class="modal fade" id="modalshow{{i.id}}" tabindex="-1" aria-labelledby="modalshow"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalshow">Informacion de la instititucion {{ i.id }}  </h5>
+                            </div>
+                     <div class="modal-body"> 
+                     <div class="row">           
+                           <div class="card">
+                              <div class="card-body">
+                                 <h1>Datos de la institucion</h1> <br><br> 
+                                 <p class="card-text">
+                                 Nombre de Institucion: <b> {{ i.name }}   </b>
+                                 <p></p>
+                                 Informacion de institucion: <b>{{ i.information }} </b>
+                                 <p></p>
+                                 Direccion: <b> {{ i.address }}  </b> 
+                                 <p></p>
+                                 Localizacion: <b> {{ i.location }} </b>                                   
+                                 <p></p>
+                                 web: <b>{{ i.web }} </b>
+                                 <p></p>
+                                 Palabras Clave De Busqueda: <b> {{ i.keywords }}  </b> 
+                                 <p></p>
+                                 Dias y horarios de atencion: <b> {{ i.date_time }} </b>
+                                 <p></p>
+                                 Informacion De Contacto: <b> {{ i.contact }}  </b> 
+                                 <p></p>
+                                {% if i.activo  %}
+                                 Dias y horarios de atencion: <b> Habilitado </b>
+                                {% else %}
+                                 Dias y horarios de atencion: <b>  Deshabilitado  </b>
+                                {% endif %}
+                                 <p></p>  
+                                 <br>
+                                  <b> SERVICIOS DE LA INSTITUCION:</b> <br>
+                                {% for s in services %}
+                                {% if i.id == s.institution_id %}
+                                 <p></p>  
+                                   servicio: {{ s.title }}<p></p>  
+                                {% endif %}
+                                {% endfor %}
+                                 </p>
+                              </div>
+                           </div>
+                          <button type="button" class="btn btn-secondary btn-lg"
+                          data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               </div>
+
+
+
+
+
+
+       <!-- modificar -->
+        <div class="modal fade" id="modaledit{{i.id}}" tabindex="-1" aria-labelledby="modaledit" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title" id="modaledit"> <b>Modificar Institucion</b></h5>
+              </div>
+              <div class="modal-body">
+                <form action="{{ url_for('institutions.update', id=i.id) }}" method="POST">
+
+                  <div class="form-group">
+                    <label class="form-label" for="name" style="float: left;"> <b> Nombre: </b> </label>
+                    <input type="text" id="name" name="name" value="{{i.name}}"
+                      class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="information" style="float: left;"> <b> Informacion de Contacto: </b> </label>
+                    <input type="text" id="information" name="information" value="{{i.information}}" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="address" style="float: left;"> <b> Direccion: </b> </label>
+                    <input type="text" id="address" name="address" value="{{i.address}}" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="location" style="float: left;"> <b> Localizacion(Lat;Long): </b> </label>
+                    <input type="text" id="location" name="location" value="{{i.location}}" class="form-control" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="web" style="float: left;"> <b> Sitio Web: </b> </label>
+                    <input type="text" id="web" name="web" value="{{i.web}}"
+                      class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="keywords" style="float: left;"> <b> Palabras Clave:(ej: cla1, cla2, cla3) </b> </label>
+                    <input type="text" id="keywords" name="keywords" value="{{i.keywords}}" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="date_time" style="float: left;"> <b> Dias y Horarios: </b> </label>
+                    <input type="text" id="date_time" name="date_time" value="{{i.date_time}}" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="contact" style="float: left;"> <b> Informacion de Contacto: </b> </label>
+                    <input type="text" id="contact" name="contact" value="{{i.contact}}" class="form-control" />
+                  </div>
+
+                  <br>
+
+                  <div>
+                    <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-save"></i>
+                      Guardar</button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        </form>
+  </div>
+</div>
+</div>
+</div>
+
+
+        {% endfor %}
+      </tbody>
+    </table> 
+<!-- Paginacion -->
+<nav>
+  <ul class="pagination"> 
+    {% if page <= 1 %}
+      <li class="page-item disabled">
+        <a class="page-link"><i class="bi bi-arrow-left"></i></a>
+      </li>
+    {% else %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('institutions.index', page=(page - 1)) }}"><i class="bi bi-arrow-left"></i></a>
+      </li>
+    {% endif %}
+    {% for i in range(1, page_count + 1) %}
+      <li class="page-item{% if i == page %} active{% endif %}">
+        <a class="page-link" href="{{ url_for('institutions.index', page=i) }}">{{i}}</a>
+      </li>
+    {% endfor %}
+    {% if page >= page_count %}
+      <li class="page-item disabled">
+        <a class="page-link"><i class="bi bi-arrow-right"></i></a>
+      </li>
+    {% else %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('institutions.index', page=(page + 1)) }}"><i class="bi bi-arrow-right"></i></a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% else %}
+<h1>Todavía no hay Instituciones registradas</h1>
+{% endif %}
+
+
+
+ </div>
+ </div>
+{% endblock %}

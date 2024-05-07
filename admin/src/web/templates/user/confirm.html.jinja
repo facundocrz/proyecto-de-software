@@ -1,0 +1,54 @@
+{% extends 'layout.html.jinja' %}
+
+{% block main %}
+<div class="d-flex justify-content-center align-items-center">
+  <div class="card">
+    <div class="card-header">
+      <h2>Confirmación de usuario</h2>
+    </div>
+    <form action="{{ url_for('user.confirm', token=token) }}" method="post" class="needs-validation" novalidate>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+          </div>
+          <div class="col-12">
+            <label for="username" class="form-label">Nombre de usuario (*)</label>
+            <input type="text" class="form-control" id="username" name="username" pattern="[a-zA-Zá-úÁ-ÚñÑ][a-zA-Zá-úÁ-ÚñÑ0-9._]{2,18}[a-zA-Zá-úÁ-ÚñÑ0-9]" required>
+            <div class="invalid-feedback">
+              Por favor, ingrese un nombre de usuario válido.
+              <br>
+              El nombre de usuario debe tener entre 4 y 20 letras, dígitos, '.' y '_'.
+              <br>
+              No puede comenzar con números o símbolos ni terminar en símbolos.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="password" class="form-label">Contraseña (*)</label>
+            <input type="password" class="form-control password-field" id="password" name="password" pattern="[^ ]{4,32}" required>
+            <div class="invalid-feedback">
+              Por favor, ingrese una contraseña válida.
+              <br>
+              Las contraseñas deben tener entre 4 y 32 carácteres, no pueden tener espacios.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="password_repeat" class="form-label">Repetir contraseña (*)</label>
+            <input type="password" class="form-control confirm-password-field" id="password_repeat" name="password_repeat" required>
+            <div class="invalid-feedback">
+              Por favor, repita la contraseña aquí. Las contraseñas deben coincidir.
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <span class="form-text">(*) Campo requerido</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+        <button type="submit" class="btn btn-success">Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

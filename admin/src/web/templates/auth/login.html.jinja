@@ -1,0 +1,30 @@
+{% extends "layout.html.jinja" %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block main %}
+<div class="d-flex justify-content-center">
+    <div class="form-signin">
+        <form action="{{url_for('auth.authenticate')}}" method="POST">
+            <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario"
+                    required>
+                <label for="username">Ingrese su nombre de usuario</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"
+                    required>
+                <label for="password">Ingrese su contraseña</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Ingresar</button>
+            <div class="container mt-5">
+                <button type="button" class="btn btn-outline-danger"
+                    onclick="window.location.href='{{url_for('google_auth.login_google')}}'">
+                    <i class="fab fa-google"></i> Ingresar con Google
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

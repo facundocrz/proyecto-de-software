@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  {% block head %}
+  <meta charset="UTF-8">
+  <meta name="description" content="Sitio de administración CIDEPINT">
+  <meta name="keywords" content="CIDEPINT">
+  <meta name="author" content="Grupo 12 - Proyecto de Software - UNLP">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}" />
+  <!-- Iconos fontawesome -->
+  <link rel="stylesheet"
+    href="{{ url_for('static', filename='fontawesome/fontawesome-free-6.4.2-web/css/all.min.css') }}">
+
+  <title>{% block title %}{% endblock %} - CIDEPINT</title>
+  {% endblock %}
+</head>
+
+<body class="container bg-dark d-flex flex-column" data-bs-theme="dark">
+  <header class="mb-3">
+    <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary navbar bg-dark border-bottom border-body"
+      data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">CIDEPINT</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between" id="nav-items">
+            <div class="d-flex flex-column flex-lg-row">
+              {% if is_authenticated() %}
+              <div class="d-flex align-items-center">
+                <li class="nav-item">
+                  {% with institutions = list_institutions() %}
+                  {% if institutions|length > 0 %}
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                      {{ get_current_institution().name or "Institución" }}
+                    </button>
+                    <ul class="dropdown-menu">
+                      {% for inst in institutions %}
+                      <li><a class="dropdown-item {% if inst.id == session.get('inst_id') %}active{% endif %}"
+                          href="{{ url_for('inst.change', instid=inst.id) }}">
+                          {{ inst.name }}
+                        </a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  {% endif %}
+                  {% endwith %}
+                </li>
+                {% if get_current_institution() %}
+                {% if check_permission("role_index") %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('role.index') }}">Roles</a>
+                </li>
+                {% endif %}
+                {% if check_permission("service_index") %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('service.index') }}">Servicios</a>
+                </li>
+                {% endif %}
+                {% if check_permission("request_index") %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('service_request.index') }}">Solicitudes de Servicios</a>
+                </li>
+                {% endif %}
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% if is_authenticated()%}
+            <div class="d-flex flex-column flex-lg-row">
+              {% if is_superadmin() %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user.index') }}">Usuarios</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('institutions.index') }}">Instituciones</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('config.index') }}">Configuracion</a>
+              </li>
+              {% endif %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-person-fill"></i> {{ get_current_user().username }}
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">Perfil</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+                </ul>
+              </li>
+            </div>
+            {% else %}
+            <div class="d-flex flex-column flex-lg-row">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url_for('user.register') }}"><button type="button"
+                    class="btn btn-light">Registrarse</button></a>
+              </li>
+            </div>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      <strong>{{ message }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block main %}
+    {% endblock %}
+  </main>
+  <footer class="bg-dark text-white text-center py-3 border-top">
+    <div class="container">
+      <p>&copy; 2023 - Grupo 12</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
+  <script>
+    (() => {
+      'use strict'
+
+      const forms = document.querySelectorAll('.needs-validation')
+
+      Array.from(forms).forEach(form => {
+        const password = form.querySelector('.password-field')
+        const confirmPassword = form.querySelector('.confirm-password-field')
+        const changePassowrd = form.querySelector('.change-password')
+
+        if (password && confirmPassword) {
+          confirmPassword.addEventListener('input', event => {
+            if (password.value != confirmPassword.value) {
+              confirmPassword.setCustomValidity("Las contraseñas deben coincidir.")
+            } else {
+              confirmPassword.setCustomValidity("")
+            }
+          });
+        }
+
+        if (changePassowrd) {
+          changePassowrd.addEventListener("change", function (e) {
+            if (changePassowrd.checked) {
+              password.removeAttribute("disabled");
+              confirmPassword.removeAttribute("disabled");
+            } else {
+              password.setAttribute("disabled", true)
+              confirmPassword.setAttribute("disabled", true)
+            }
+          })
+        }
+
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  </script>
+  {% block script %}
+  {% endblock %}
+</body>
+
+</html>

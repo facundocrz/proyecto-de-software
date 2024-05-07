@@ -1,0 +1,80 @@
+{% extends "layout.html.jinja" %}
+
+{% block main %}
+<style>
+    /* Estilos personalizados para la página de error 404 */
+    .error-container {
+        text-align: center;
+        margin-top: 100px;
+    }
+    .error-containerLeft {
+       text-align: left;
+       margin-top: 100px;
+    }
+
+    .error-title {
+        font-size: 36px;
+        color: #007A5E;
+        /* Verde oscuro similar al color de la bandera argentina */
+    }
+
+    .error-description {
+        font-size: 24px;
+        color: black;
+        margin-top: 20px;
+    }
+
+    /* Estilo personalizado para resaltar la victoria de Argentina */
+    .argentina-champion {
+        font-weight: bold;
+        font-size: 28px;
+        color: #75AADB;
+        /* Azul claro */
+        margin-top: 10px;
+    }
+
+    /* Estilo para animar los mensajes */
+    .not-found-message {
+        font-size: 48px;
+        color: #FF5733;
+        /* Rojo */
+        animation: moveText 2s linear infinite alternate;
+    }
+
+    @keyframes moveText {
+        from {
+            transform: translateY(-5px);
+        }
+
+        to {
+            transform: translateY(5px);
+        }
+    }
+</style>
+
+<script>
+    // JavaScript para mostrar ambos mensajes al mismo tiempo
+    document.addEventListener('DOMContentLoaded', function () {
+        const message1 = document.querySelector('.message-1');
+        const message2 = document.querySelector('.message-2');
+
+        message1.style.display = 'block'; // Mostrar el primer mensaje
+        message2.style.display = 'block'; // Mostrar el segundo mensaje
+    });
+</script>
+<div class= "error-containerLeft"> 
+        <h1 class="error-title">{{ error_name }}</h1>
+        <p class="error-description">{{ error_description }} 😞</p>
+</div>
+<div class="error-container">
+    <!-- Mensaje 1 (Página no encontrada) -->
+    <p class="not-found-message message-1">Página no encontrada</p>
+
+    <!-- Mensaje 2 (404 Not Found) -->
+    <p class="not-found-message message-2">404 Not Found</p>
+    <p class="argentina-champion">Pero te recodamos que...</p>
+    <p class="argentina-champion">¡Argentina Campeona del Mundo!</p>
+    <img src="static/imagenes/argentinaCampeon.jpg" alt="Imagen de la selección argentina campeona del mundo">
+</div>
+
+{% endblock %}
